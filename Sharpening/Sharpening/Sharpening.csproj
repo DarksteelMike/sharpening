@@ -1,0 +1,74 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8FC354B0-9731-4C68-AE87-0BE0B6B7E252}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sharpening</RootNamespace>
+    <AssemblyName>Sharpening</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActivatableSystem\Activatable.cs" />
+    <Compile Include="ActivatableSystem\ActivatableFactory.cs" />
+    <Compile Include="ActivatableSystem\CompoundCost.cs" />
+    <Compile Include="ActivatableSystem\CompoundEffect.cs" />
+    <Compile Include="ActivatableSystem\Cost.cs" />
+    <Compile Include="ActivatableSystem\CostFactory.cs" />
+    <Compile Include="CardBase.cs" />
+    <Compile Include="CardCompiler.cs" />
+    <Compile Include="Cards\Plains.cs" />
+    <Compile Include="CharacteristicsCollection.cs" />
+    <Compile Include="Layersystem\CELayerEntry.cs" />
+    <Compile Include="Layersystem\CELayerSystem.cs" />
+    <Compile Include="Game.cs" />
+    <Compile Include="InputStateFactory.cs" />
+    <Compile Include="InputStateMachineSystem\InputState.cs" />
+    <Compile Include="InputStateMachineSystem\InputStateMachine.cs" />
+    <Compile Include="ManaSystem\ManaPoint.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReplacableEventSystem\ReplacableEvent.cs" />
+    <Compile Include="ReplacableEventSystem\ReplacingEvent.cs" />
+    <Compile Include="SchedulerSystem\EffectScheduler.cs" />
+    <Compile Include="SchedulerSystem\EffectSchedulerEntry.cs" />
+    <Compile Include="Spell.cs" />
+    <Compile Include="StateBasedEffectSystem\StateBasedEffectSystem.cs" />
+    <Compile Include="TextChangeOperation.cs" />
+    <Compile Include="UserInterfaceSystem\CardActivationEventArgs.cs" />
+    <Compile Include="UserInterfaceSystem\IUserInterfaceBridge.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
