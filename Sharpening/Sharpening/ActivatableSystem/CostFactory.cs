@@ -7,7 +7,7 @@ namespace Sharpening
 {
     internal static class CostFactory
     {
-        internal static Cost CreateCost(Game g,string CostType)
+        internal static Cost Create(Game g,string CostType)
         {
             string NewDescription;
             Effect NewDoPayment;

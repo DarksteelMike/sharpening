@@ -7,14 +7,14 @@ namespace Sharpening
 {
     internal abstract class CardBase
     {
-        private Game InvolvedGame;
+        protected Game InvolvedGame;
 
         //For text-changing effects
         //Type: Artificial Evolution
         //Land: Magical Hack,Spectral Shift
         //Color: Alter Reality,Balduvian Shaman,Glamerdye,Sleight of Mind,Spectral Shift,Swirl the Mists
         //Both Land and Color: Crystal Spray, Mind Bend,Whim of Volrath
-        private string GetFinalText(string BeginningWord,List<TextChangeOperation> Changers)
+        protected string GetFinalText(string BeginningWord,List<TextChangeOperation> Changers)
         {
             string Result = BeginningWord;
             foreach (TextChangeOperation Op in Changers)
@@ -64,72 +64,72 @@ namespace Sharpening
             return false;
         }
         
-        private List<TextChangeOperation> typeChangeOperations;
+        protected List<TextChangeOperation> typeChangeOperations;
         internal List<TextChangeOperation> TypeChangeOperations
         {
             get { return typeChangeOperations; }
         }
 
-        private List<TextChangeOperation> landChangeOperations;
+        protected List<TextChangeOperation> landChangeOperations;
         internal List<TextChangeOperation> LandChangeOperations
         {
             get { return landChangeOperations; }
         }
 
-        private List<TextChangeOperation> colorChangeOperations;
+        protected List<TextChangeOperation> colorChangeOperations;
         internal List<TextChangeOperation> ColorChangeOperations 
         {
             get { return colorChangeOperations; }
         }
 
-        private static int nextTimestamp = 0;
+        protected static int nextTimestamp = 0;
         internal static int NextTimestamp
         {
             get { return ++nextTimestamp; }
         }
-        private static int nextCardID = 0;
+        protected static int nextCardID = 0;
         internal static int NextCardID
         {
             get { return ++nextCardID; }
         }
 
-        private int timestamp;
+        protected int timestamp;
         internal int Timestamp
         {
             get { return timestamp; }
         }
 
-        private int cardID;
+        protected int cardID;
         internal int CardID
         {
             get { return cardID; }
         }
 
-        private string name;
+        protected string name;
         internal string Name
         {
             get { return name; }
         }
 
-        private ReplacableEvent Destroyed;
-        private ReplacableEvent EntersBattlefield;
-        private ReplacableEvent LeavesBattlefield;
-        private ReplacableEvent EntersGraveyard;
-        private ReplacableEvent LeavesGraveyard;
-        private ReplacableEvent Tapped;
-        private ReplacableEvent Untapped;
-        private ReplacableEvent Damaged;
-        private ReplacableEvent DiscardedAsCost;
-        private ReplacableEvent DiscardedAsEffect;
-        private ReplacableEvent Discarded;
+        protected ReplacableEvent Destroyed;
+        protected ReplacableEvent EntersBattlefield;
+        protected ReplacableEvent LeavesBattlefield;
+        protected ReplacableEvent EntersGraveyard;
+        protected ReplacableEvent LeavesGraveyard;
+        protected ReplacableEvent Tapped;
+        protected ReplacableEvent Untapped;
+        protected ReplacableEvent Damaged;
+        protected ReplacableEvent DiscardedAsCost;
+        protected ReplacableEvent DiscardedAsEffect;
+        protected ReplacableEvent Discarded;
 
-        private List<Activatable> activatables;
+        protected List<Activatable> activatables;
         internal List<Activatable> Activatables
         {
             get { return activatables; }
         }
 
-        private CharacteristicsCollection characteristics;
+        protected CharacteristicsCollection characteristics;
         internal CharacteristicsCollection Characteristics
         {
             get { return characteristics; }

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 using System.Text;
 
-namespace Sharpening.UserInterfaceSystem
+namespace Sharpening
 {
     internal static class ActivatableFactory
     {
-        internal static Activatable CreateActivatable(Game g,CardBase TargetCard,string ActivatableType)
+        internal static Activatable Create(Game g,CardBase TargetCard,string ActivatableType)
         {
-            bool NewIsManaAbility;
-            Condition NewCondition;
-            CompoundCost NewCost;
-            CompoundEffect NewEffect;
-            string NewDescription;
+            bool NewIsManaAbility = false;
+            Condition NewCondition = null;
+            CompoundCost NewCost = null;
+            CompoundEffect NewEffect = null;
+            string NewDescription = null;
 
             if (ActivatableType.StartsWith("Flashback:"))
             {
@@ -37,7 +37,7 @@ namespace Sharpening.UserInterfaceSystem
                 List<Cost> SingleCosts = new List<Cost>();
                 foreach (string s in Costs)
                 {
-                    SingleCosts.Add(CostFactory.CreateCost(g,s));
+                    SingleCosts.Add(CostFactory.Create(g,s));
                 }
                 NewCost = new CompoundCost(SingleCosts.ToArray());
 
@@ -50,11 +50,45 @@ namespace Sharpening.UserInterfaceSystem
                 AllEffects.AddRange(TargetCard.Activatables[0].ActivatedEffect.MyEffects.ToArray());
                 AllEffects.Add(AddedEffect);
                 NewEffect = new CompoundEffect(AllEffects.ToArray());
+            }
+            else if(ActivatableType.StartsWith("Manatap:"))
+            {
+                //It's a mana ability
+                NewIsManaAbility = true;
 
-                return new Activatable(TargetCard, false, NewCost, NewCondition, NewEffect, NewDescription);
+                //Can only be activated on the battlefield
+                NewCondition = delegate(object[] param) {
+                    return (TargetCard.Characteristics.Location == CardLocation.Battlefield) && !TargetCard.Characteristics.IsTapped;
+                };
+
+                //Parse how much mana you get and any costs
+                string FullCost = ActivatableType.Split(':')[1];
+                string[] Costs = FullCost.Split('+');
+                string ManaMade = ActivatableType.Split(':')[2];
+                NewDescription = "";
+
+                if (FullCost != "-")
+                {
+                    List<Cost> MyCosts = new List<Cost>();
+                    foreach (string c in Costs)
+                    {
+                        MyCosts.Add(CostFactory.Create(g, c));
+                    }
+
+                    NewCost = new CompoundCost(MyCosts.ToArray());
+                    NewDescription = NewCost.Description + ",";
+                }
+
+                NewEffect = new CompoundEffect(delegate(object[] param) {
+                    //Tap the card
+
+                    //Add the mana
+                });
+
+                NewDescription += "tap: Add " + ManaMade + " to your manapool.";
             }
 
-            return null;
+            return new Activatable(TargetCard, NewIsManaAbility, NewCost, NewCondition, NewEffect, NewDescription);
         }
     }
 }

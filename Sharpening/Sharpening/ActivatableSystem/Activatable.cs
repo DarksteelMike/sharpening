@@ -42,14 +42,14 @@ namespace Sharpening
             get { return description; }
         }
 
-        internal Activatable(CardBase c,bool m,CompoundCost co,Condition can,CompoundEffect doit,string d)
+        internal Activatable(CardBase cardsrc,bool manaability,CompoundCost cost,Condition canbeactivated,CompoundEffect effect,string desc)
         {
-            cardSrc = c;
-            isManaAbility = m;
-            myCost = co;
-            canBeActivated = can;
-            activatedEffect = doit;
-            description = d;
+            cardSrc = cardsrc;
+            isManaAbility = manaability;
+            myCost = cost;
+            canBeActivated = canbeactivated;
+            activatedEffect = effect;
+            description = desc;
         }
     }
 }
