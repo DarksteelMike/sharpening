@@ -83,6 +83,12 @@ namespace Sharpening
             get { return subtypes; }
         }
 
+        private bool isTapped;
+        internal bool IsTapped
+        {
+            get { return isTapped; }
+        }
+
         public CharacteristicsCollection()
         {
             supertypes = new List<string>();

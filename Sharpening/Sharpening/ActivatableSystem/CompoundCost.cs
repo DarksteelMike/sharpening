@@ -13,6 +13,19 @@ namespace Sharpening
             get { return costs; }
         }
 
+        internal string Description
+        {
+            get
+            {
+                string ret = "";
+                foreach (Cost c in costs)
+                {
+                    ret += "," + c.Description;
+                }
+                return ret.Substring(1);
+            }
+        }
+
         internal CompoundCost(params Cost[] c)
         {
             costs = new List<Cost>();
