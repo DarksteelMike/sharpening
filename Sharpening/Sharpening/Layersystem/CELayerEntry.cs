@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using System.Text;
+using System.Reflection;
 
 namespace Sharpening
 {
@@ -9,7 +10,7 @@ namespace Sharpening
     {
         private Effect myEffect;
         internal Effect MyEffect
-        { 
+        {
             get { return myEffect; }
         }
         private CardBase cardSrc;
@@ -21,6 +22,19 @@ namespace Sharpening
         internal bool IsCDA
         {
             get { return isCDA; }
+        }
+
+        //Dependency
+        private List<FieldInfo> dependsOnFields;
+        internal List<FieldInfo> DependsOnFields
+        {
+            get { return dependsOnFields; }
+        }
+
+        private List<FieldInfo> changingFields;
+        internal List<FieldInfo> ChangingFields
+        {
+            get { return changingFields; }
         }
 
         internal CELayerEntry(Effect e, CardBase c, bool i)

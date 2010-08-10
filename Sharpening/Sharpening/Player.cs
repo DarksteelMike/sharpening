@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sharpening
 {
-    public enum CardLocation { Library,Hand,Battlefield,Graveyard,Exile };
+    public enum CardLocation { Library, Hand, Battlefield, Graveyard, Exile };
 
     internal class Player
     {
@@ -47,6 +47,7 @@ namespace Sharpening
         internal int LandsPlayedThisTurn
         {
             get { return landsPlayedThisTurn; }
+            set { landsPlayedThisTurn = value; }
         }
 
         private ReplacableEvent LoseLife;
@@ -88,7 +89,13 @@ namespace Sharpening
             get { return ownedCards; }
         }
 
-        public Player(int id,Game g)
+        private ManaPool myPool;
+        internal ManaPool MyPool
+        {
+            get { return myPool; }
+        }
+
+        public Player(int id, Game g)
         {
             playerID = id;
             InvolvedGame = g;
@@ -96,6 +103,7 @@ namespace Sharpening
             poisonCounters = 0;
             landsPlayedThisTurn = 0;
             maxLandPerTurn = 1;
+            myPool = new ManaPool();
 
             libraryCards = new List<CardBase>();
             handCards = new List<CardBase>();
@@ -116,12 +124,12 @@ namespace Sharpening
 
             DrawCard = new ReplacableEvent(new Effect(delegate(object[] param)
             {
-                life -= (int)param[0];
+
             }));
 
             DiscardCard = new ReplacableEvent(new Effect(delegate(object[] param)
             {
-                
+
             }));
 
             DiscardCardAsCost = new ReplacableEvent(new Effect(delegate(object[] param)
