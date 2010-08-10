@@ -7,10 +7,11 @@ namespace Sharpening
 {
     internal static class CostFactory
     {
-        internal static Cost Create(Game g,string CostType)
+        internal static Cost Create(Game g, string CostType)
         {
-            string NewDescription;
-            Effect NewDoPayment;
+            string NewDescription = "";
+            Effect NewDoPayment = null;
+            bool NewIsManaCost = false;
 
             if (CostType.StartsWith("Discard("))
             {
@@ -28,7 +29,7 @@ namespace Sharpening
                 }
                 if (Type != "Any")
                 {
-                    NewDescription += " " + Type; 
+                    NewDescription += " " + Type;
                 }
                 NewDescription += " card";
                 if (AmountToDiscard > 1)
@@ -42,22 +43,24 @@ namespace Sharpening
 
                 };
 
-                return new Cost(NewDescription, NewDoPayment);
+                NewIsManaCost = false;
             }
             else if (CostType.StartsWith("Sacrifice("))
             {
 
+                NewIsManaCost = false;
             }
             else if (CostType.StartsWith("Reveal("))
             {
 
+                NewIsManaCost = false;
             }
-            else //Mana cost
+            else if (CostType.StartsWith("Mana(")) //Mana cost
             {
-
+                NewIsManaCost = true;
             }
 
-            return null;
+            return new Cost(NewDescription, NewDoPayment, NewIsManaCost);
         }
     }
 }

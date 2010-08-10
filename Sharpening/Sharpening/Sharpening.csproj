@@ -49,7 +49,9 @@
     <Compile Include="InputStateFactory.cs" />
     <Compile Include="InputStateMachineSystem\InputState.cs" />
     <Compile Include="InputStateMachineSystem\InputStateMachine.cs" />
+    <Compile Include="Layersystem\CELayerWalkEntry.cs" />
     <Compile Include="ManaSystem\ManaPoint.cs" />
+    <Compile Include="ManaSystem\ManaPool.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplacableEventSystem\ReplacableEvent.cs" />

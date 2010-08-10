@@ -25,10 +25,17 @@ namespace Sharpening
             get { return isPaid; }
         }
 
-        public Cost(string d, Effect p)
+        private bool isManaCost;
+        internal bool IsManaCost
+        {
+            get { return isManaCost; }
+        }
+
+        public Cost(string d, Effect p, bool i)
         {
             description = d;
             doPayment = p;
+            isManaCost = i;
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Sharpening
 {
     internal static class ActivatableFactory
     {
-        internal static Activatable Create(Game g,CardBase TargetCard,string ActivatableType)
+        internal static Activatable Create(Game g, CardBase TargetCard, string ActivatableType)
         {
             bool NewIsManaAbility = false;
             Condition NewCondition = null;
@@ -15,7 +15,39 @@ namespace Sharpening
             CompoundEffect NewEffect = null;
             string NewDescription = null;
 
-            if (ActivatableType.StartsWith("Flashback:"))
+            if (ActivatableType.StartsWith("PlayLand"))
+            {
+                //Create a casting Activatable
+                NewCondition = new Condition(delegate(object[] param)
+                {
+                    bool Result;
+
+                    //Is it our controllers turn?
+                    Result = g.Players[g.WhoseTurn] == TargetCard.Characteristics.Controller;
+
+                    //Are we in the hand?
+                    Result = Result && (TargetCard.Characteristics.Location == CardLocation.Hand);
+
+                    //Has our controller played less than the maximum amount of lands this turn?
+                    Result = Result && (TargetCard.Characteristics.Controller.LandsPlayedThisTurn < TargetCard.Characteristics.Controller.MaxLandPerTurn);
+
+                    return Result;
+
+                });
+
+                NewEffect = new CompoundEffect(new Effect(delegate(object[] target)
+                {
+                    TargetCard.Move(CardLocation.Battlefield);
+                    TargetCard.Characteristics.Controller.LandsPlayedThisTurn++;
+                }));
+
+                NewCost = new CompoundCost(CostFactory.Create(g, "-"));
+
+                NewDescription = "";
+
+                NewIsManaAbility = false;
+            }
+            else if (ActivatableType.StartsWith("Flashback:"))
             {
                 //Flashback is not a mana ability
                 NewIsManaAbility = false;
@@ -28,7 +60,7 @@ namespace Sharpening
 
 
                 //Describe the activatable
-                NewDescription = TargetCard.Name + " - Flashback";
+                NewDescription = TargetCard.Name + " Flashback - " + TargetCard.Activatables[0].Description + " Then exile " + TargetCard.Name + ".";
 
                 //Construct the cost
                 string FullCost = ActivatableType.Split(':')[1];
@@ -37,7 +69,7 @@ namespace Sharpening
                 List<Cost> SingleCosts = new List<Cost>();
                 foreach (string s in Costs)
                 {
-                    SingleCosts.Add(CostFactory.Create(g,s));
+                    SingleCosts.Add(CostFactory.Create(g, s));
                 }
                 NewCost = new CompoundCost(SingleCosts.ToArray());
 
@@ -51,13 +83,14 @@ namespace Sharpening
                 AllEffects.Add(AddedEffect);
                 NewEffect = new CompoundEffect(AllEffects.ToArray());
             }
-            else if(ActivatableType.StartsWith("Manatap:"))
+            else if (ActivatableType.StartsWith("Manatap:"))
             {
                 //It's a mana ability
                 NewIsManaAbility = true;
 
                 //Can only be activated on the battlefield
-                NewCondition = delegate(object[] param) {
+                NewCondition = delegate(object[] param)
+                {
                     return (TargetCard.Characteristics.Location == CardLocation.Battlefield) && !TargetCard.Characteristics.IsTapped;
                 };
 
@@ -79,10 +112,13 @@ namespace Sharpening
                     NewDescription = NewCost.Description + ",";
                 }
 
-                NewEffect = new CompoundEffect(delegate(object[] param) {
+                NewEffect = new CompoundEffect(delegate(object[] param)
+                {
                     //Tap the card
+                    TargetCard.Characteristics.IsTapped = true;
 
                     //Add the mana
+
                 });
 
                 NewDescription += "tap: Add " + ManaMade + " to your manapool.";

@@ -14,7 +14,7 @@ namespace Sharpening
         //Land: Magical Hack,Spectral Shift
         //Color: Alter Reality,Balduvian Shaman,Glamerdye,Sleight of Mind,Spectral Shift,Swirl the Mists
         //Both Land and Color: Crystal Spray, Mind Bend,Whim of Volrath
-        protected string GetFinalText(string BeginningWord,List<TextChangeOperation> Changers)
+        protected string GetFinalText(string BeginningWord, List<TextChangeOperation> Changers)
         {
             string Result = BeginningWord;
             foreach (TextChangeOperation Op in Changers)
@@ -29,7 +29,7 @@ namespace Sharpening
         {
             foreach (string s in characteristics.Supertypes)
             {
-                if(Supertype == GetFinalText(s,typeChangeOperations))
+                if (Supertype == GetFinalText(s, typeChangeOperations))
                 {
                     return true;
                 }
@@ -42,7 +42,7 @@ namespace Sharpening
         {
             foreach (string s in characteristics.Types)
             {
-                if(Type == GetFinalText(s,typeChangeOperations))
+                if (Type == GetFinalText(s, typeChangeOperations))
                 {
                     return true;
                 }
@@ -55,7 +55,7 @@ namespace Sharpening
         {
             foreach (string s in characteristics.Subtypes)
             {
-                if(Subtype == GetFinalText(s,typeChangeOperations))
+                if (Subtype == GetFinalText(s, typeChangeOperations))
                 {
                     return true;
                 }
@@ -63,7 +63,7 @@ namespace Sharpening
 
             return false;
         }
-        
+
         protected List<TextChangeOperation> typeChangeOperations;
         internal List<TextChangeOperation> TypeChangeOperations
         {
@@ -77,7 +77,7 @@ namespace Sharpening
         }
 
         protected List<TextChangeOperation> colorChangeOperations;
-        internal List<TextChangeOperation> ColorChangeOperations 
+        internal List<TextChangeOperation> ColorChangeOperations
         {
             get { return colorChangeOperations; }
         }
@@ -144,7 +144,7 @@ namespace Sharpening
             colorChangeOperations = new List<TextChangeOperation>();
             landChangeOperations = new List<TextChangeOperation>();
 
-             activatables = new List<Activatable>();
+            activatables = new List<Activatable>();
 
             Destroyed = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
@@ -227,6 +227,6 @@ namespace Sharpening
             }
         }
 
-        
+
     }
 }

@@ -87,6 +87,7 @@ namespace Sharpening
         internal bool IsTapped
         {
             get { return isTapped; }
+            set { isTapped = value; }
         }
 
         public CharacteristicsCollection()
