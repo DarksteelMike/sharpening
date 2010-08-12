@@ -23,13 +23,13 @@ namespace Sharpening
                     bool Result;
 
                     //Is it our controllers turn?
-                    Result = g.Players[g.WhoseTurn] == TargetCard.Characteristics.Controller;
+                    Result = g.Players[g.WhoseTurn] == TargetCard.CurrentCharacteristics.Controller;
 
                     //Are we in the hand?
-                    Result = Result && (TargetCard.Characteristics.Location == CardLocation.Hand);
+                    Result = Result && (TargetCard.CurrentCharacteristics.Location == CardLocation.Hand);
 
                     //Has our controller played less than the maximum amount of lands this turn?
-                    Result = Result && (TargetCard.Characteristics.Controller.LandsPlayedThisTurn < TargetCard.Characteristics.Controller.MaxLandPerTurn);
+                    Result = Result && (TargetCard.CurrentCharacteristics.Controller.LandsPlayedThisTurn < TargetCard.CurrentCharacteristics.Controller.MaxLandPerTurn);
 
                     return Result;
 
@@ -38,7 +38,7 @@ namespace Sharpening
                 NewEffect = new CompoundEffect(new Effect(delegate(object[] target)
                 {
                     TargetCard.Move(CardLocation.Battlefield);
-                    TargetCard.Characteristics.Controller.LandsPlayedThisTurn++;
+                    TargetCard.CurrentCharacteristics.Controller.LandsPlayedThisTurn++;
                 }));
 
                 NewCost = new CompoundCost(CostFactory.Create(g, "-"));
@@ -55,7 +55,7 @@ namespace Sharpening
                 //Can only be activated when in the graveyard
                 NewCondition = delegate(object[] param)
                 {
-                    return TargetCard.Characteristics.Location == CardLocation.Graveyard;
+                    return TargetCard.CurrentCharacteristics.Location == CardLocation.Graveyard;
                 };
 
 
@@ -91,7 +91,7 @@ namespace Sharpening
                 //Can only be activated on the battlefield
                 NewCondition = delegate(object[] param)
                 {
-                    return (TargetCard.Characteristics.Location == CardLocation.Battlefield) && !TargetCard.Characteristics.IsTapped;
+                    return (TargetCard.CurrentCharacteristics.Location == CardLocation.Battlefield) && !TargetCard.CurrentCharacteristics.IsTapped;
                 };
 
                 //Parse how much mana you get and any costs
@@ -115,7 +115,7 @@ namespace Sharpening
                 NewEffect = new CompoundEffect(delegate(object[] param)
                 {
                     //Tap the card
-                    TargetCard.Characteristics.IsTapped = true;
+                    TargetCard.CurrentCharacteristics.IsTapped = true;
 
                     //Add the mana
 

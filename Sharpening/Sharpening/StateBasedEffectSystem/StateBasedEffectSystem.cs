@@ -43,7 +43,7 @@ namespace Sharpening
                         {
                             if (Card.HasType("Creature"))
                             {
-                                if (Card.Characteristics.ActualToughness == 0)
+                                if (Card.CurrentCharacteristics.Toughness == 0)
                                 {
                                     Card.Move(CardLocation.Graveyard);
                                     EventsFired++;
@@ -51,12 +51,21 @@ namespace Sharpening
                             }                            
                         }
                     }
-
                 }));
 
             SBE03_LethalDamageCheck = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
-                    EventsFired++;
+                    foreach(Player p in InvolvedGame.Players)
+                    {
+                    	foreach(CardBase Card in p.BattlefieldCards)
+                        {
+                        	if(Card.CurrentCharacteristics.AssignedDamage >= Card.CurrentCharacteristics.Toughness)
+                            {
+                            	Card.Move(CardLocation.Graveyard);
+                            	EventsFired++;
+                            }
+                        }
+                    }                    
                 }));
 
             SBE04_AuraLegalAttachmentCheck = new ReplacableEvent(new Effect(delegate(object[] param)
@@ -69,11 +78,11 @@ namespace Sharpening
                     List<CardBase> Legendaries = new List<CardBase>();
                     foreach (Player p in InvolvedGame.Players)
                     {
-                        foreach (CardBase c in p.BattlefieldCards)
+                        foreach (CardBase Card in p.BattlefieldCards)
                         {
-                            if (c.HasSupertype("Legendary"))
+                            if (Card.HasSupertype("Legendary"))
                             {
-                                Legendaries.Add(c);
+                                Legendaries.Add(Card);
                             }
                         }
                     }
@@ -111,8 +120,37 @@ namespace Sharpening
 
             SBE09_WorldRuleCheck = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
-                    EventsFired++;
-                }));
+                   List<CardBase> Worlds = new List<CardBase>();
+                   foreach(Player p in InvolvedGame.Players)
+                   {
+                    	foreach(CardBase Card in p.BattlefieldCards)
+                    	{
+                         	if(Card.CurrentCharacteristics.Supertypes.Contains("World"))
+                        	{
+                             	Worlds.Add(Card);
+                        	}
+                    	}
+                    }
+                                                                  	
+                    int max = int.MinValue;
+                    int maxat = -1;
+                    for(int i=0;i<Worlds.Count;i++)
+                    {
+                    	if(Worlds[i].Timestamp > max)
+                    	{
+                        	max = Worlds[i].Timestamp;
+                        	maxat = i;
+                    	}
+                    }
+                                                                  	
+                    Worlds.RemoveAt(maxat);
+                                                                  	
+                    foreach(CardBase Card in Worlds)
+                    {
+                    	Card.Move(CardLocation.Graveyard);
+                    	EventsFired++;
+                	}
+ 				}));
             
             SBE10_MisplacedCopyCheck = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
@@ -131,17 +169,70 @@ namespace Sharpening
 
             SBE13_CounterBalanceCheck = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
-                    EventsFired++;
+                   	foreach(Player p in InvolvedGame.Players)
+                    {
+                    	foreach(CardBase Card in p.BattlefieldCards)
+                    	{
+                    		while(Utility.CountInList<string>(Card.CurrentCharacteristics.Counters,"+1/+1") > 0 && Utility.CountInList<string>(Card.CurrentCharacteristics.Counters,"-1/-1") > 0)
+                    		{
+                    			Card.CurrentCharacteristics.Counters.Remove("+1/+1");
+                    			Card.CurrentCharacteristics.Counters.Remove("-1/-1");
+                    			EventsFired++;
+                    		}
+                    	}
+                    }
                 }));
 
             SBE14_PlaneswalkerLoyaltyCheck = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
-                    EventsFired++;
+                	foreach(Player p in InvolvedGame.Players)
+                    {
+                    	foreach(CardBase Card in p.BattlefieldCards)
+                        {
+                        	if(Card.CurrentCharacteristics.Types.Contains("Planeswalker"))
+                            {
+                            	if(Utility.CountInList<string>(Card.CurrentCharacteristics.Counters,"Loyalty") == 0)
+                                {
+                                	Card.Move(CardLocation.Graveyard);
+                                	EventsFired++;
+                                }
+                            }
+                       	}
+                 	}
                 }));
 
             SBE15_PlaneswalkerUniquenessCheck = new ReplacableEvent(new Effect(delegate(object[] param)
                 {
-                    EventsFired++;
+                	List<CardBase> Planeswalkers = new List<CardBase>();
+                    foreach(Player p in InvolvedGame.Players)
+                    {
+                    	foreach(CardBase Card in p.BattlefieldCards)
+                        {
+                        	if(Card.CurrentCharacteristics.Types.Contains("Planeswalker"))
+                            {
+                            	Planeswalkers.Add(Card);
+                            }
+                        }
+                    }
+                    
+                    List<CardBase> HasDupes = new List<CardBase>();
+                    for(int i = 0;i<Planeswalkers.Count;i++)
+                    {
+                    	for(int j=0;j<Planeswalkers.Count;j++)
+                        {
+                        	if(Planeswalkers[i].CurrentCharacteristics.Subtypes[0] == Planeswalkers[j].CurrentCharacteristics.Subtypes[0] && i != j)
+                            {
+                            	HasDupes.Add(Planeswalkers[i]);
+                            	HasDupes.Add(Planeswalkers[j]);
+                            }
+                        }
+                    }
+                                                                               	
+                    foreach(CardBase Card in HasDupes)
+                    {
+                    	Card.Move(CardLocation.Graveyard);
+                    	EventsFired++;
+                    }
                 }));
         }
 

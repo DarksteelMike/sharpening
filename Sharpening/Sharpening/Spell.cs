@@ -18,6 +18,12 @@ namespace Sharpening
         {
             get { return resolve; }
         }
+        
+        private Condition canResolve;
+        internal Condition CanResolve
+        {
+        	get { return canResolve; }
+        }
 
         private string description;
         internal string Description

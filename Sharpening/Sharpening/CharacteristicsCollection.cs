@@ -33,30 +33,16 @@ namespace Sharpening
             set { location = value; }
         }
 
-        private int basePower;
-        internal int BasePower
+        private int power;
+        internal int Power
         {
-            get { return basePower; }
+            get { return Power; }
         }
 
-        private int baseToughness;
-        internal int BaseToughness
+        private int toughness;
+        internal int Toughness
         {
-            get { return baseToughness; }
-        }
-
-        private int actualPower;
-        internal int ActualPower
-        {
-            get { return actualPower; }
-            set { actualPower = value; }
-        }
-
-        private int actualToughness;
-        internal int ActualToughness
-        {
-            get { return actualToughness; }
-            set { ActualToughness = value; }
+            get { return Toughness; }
         }
 
         private int assignedDamage;
@@ -89,16 +75,56 @@ namespace Sharpening
             get { return isTapped; }
             set { isTapped = value; }
         }
+        
+        private List<string> counters;
+        internal List<string> Counters
+        {
+        	get { return counters; }
+        }
+        
+        private List<string> keywords;
+        internal List<string> Keywords
+        {
+        	get { return keywords; }
+        }
+        
+        private string color;
+        internal string Color
+        {
+        	get { return color; }
+        }
 
         public CharacteristicsCollection()
         {
             supertypes = new List<string>();
             types = new List<string>();
             subtypes = new List<string>();
+            counters = new List<string>();
+            keywords = new List<string>();
 
             previousLocation = CardLocation.Library;
             location = CardLocation.Library;
 
+        }
+        
+        internal CharacteristicsCollection(Player COwner,Player CController, CardLocation CPreviousLocation,CardLocation CLocation,int CPower,int CToughness,int CAssignedDamage,List<string> CSupertypes,List<string> CTypes,List<string> CSubtypes,bool CIsTapped)
+        {
+        	owner = COwner;
+        	controller = CController;
+        	previousLocation = CPreviousLocation;
+        	location = CLocation;
+        	power = CPower;
+        	toughness = CToughness;
+        	assignedDamage = CAssignedDamage;
+        	supertypes = CSupertypes;
+        	types = CTypes;
+        	subtypes = CSubtypes;
+        	isTapped = CIsTapped;
+        }
+        
+        internal CharacteristicsCollection Copy()
+        {
+        	return new CharacteristicsCollection(owner,controller,previousLocation,location,power,toughness,assignedDamage,supertypes,types,subtypes,isTapped);
         }
     }
 }

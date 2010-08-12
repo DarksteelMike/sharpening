@@ -66,6 +66,20 @@ namespace Sharpening
 
             return StringContainsAny(Haystack, NewNeedles);
         }
+        
+        internal static int CountInList<T>(List<T> Haystack,T Needle)
+        {
+        	int Result = 0;
+        	foreach(T Straw in Haystack)
+        	{
+        		if(Straw.Equals(Needle))
+        		{
+        			Result++;
+        		}
+        	}
+        	
+        	return Result;
+        }
 
         internal static readonly string Numbers = "0123456789";
     }

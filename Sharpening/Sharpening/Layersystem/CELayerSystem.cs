@@ -61,16 +61,29 @@ namespace Sharpening
             LayerMap[Layer].Add(Entry);
             if (Layer != CELayer.Layer7A && Layer != CELayer.Layer7B && Layer != CELayer.Layer7C && Layer != CELayer.Layer7D && Layer != CELayer.Layer7E)
             {
-                SortLayerCDA(LayerMap[Layer]);
+                FullSortCDA(LayerMap[Layer]);
             }
             else
             {
-                SortLayer(LayerMap[Layer]);
+                FullSort(LayerMap[Layer]);
             }
         }
 
         internal void RemoveAllEntriesFromCard(CardBase Card)
         {
+        	Dictionary<CELayer,bool> ShouldSort = new Dictionary<CELayer,bool>();
+        	ShouldSort.Add(CELayer.Layer1,false);
+        	ShouldSort.Add(CELayer.Layer2,false);
+        	ShouldSort.Add(CELayer.Layer3,false);
+        	ShouldSort.Add(CELayer.Layer4,false);
+        	ShouldSort.Add(CELayer.Layer5,false);
+        	ShouldSort.Add(CELayer.Layer6,false);
+        	ShouldSort.Add(CELayer.Layer7A,false);
+        	ShouldSort.Add(CELayer.Layer7B,false);
+        	ShouldSort.Add(CELayer.Layer7C,false);
+        	ShouldSort.Add(CELayer.Layer7D,false);
+        	ShouldSort.Add(CELayer.Layer7E,false);
+        	
             foreach (CELayer LayerKey in LayerMap.Keys)
             {
                 foreach (CELayerWalkEntry Entry in LayerMap[LayerKey])
@@ -78,109 +91,22 @@ namespace Sharpening
                     if (Entry.CardSrc.CardID == Card.CardID)
                     {
                         LayerMap[LayerKey].Remove(Entry);
+                        ShouldSort[LayerKey] = true;
                     }
                 }
             }
-        }
 
-        //Bubblesorts by timestamp
-        private void SortLayer(List<CELayerWalkEntry> Layer)
-        {
-            bool HasChanged = false;
-            do
+            foreach (CELayer LayerKey in ShouldSort.Keys)
             {
-                HasChanged = false;
-                for (int i = 0; i < Layer.Count - 1; i++)
+                if (ShouldSort[LayerKey])
                 {
-                    if (Layer[i].CardSrc.Timestamp > Layer[i + 1].CardSrc.Timestamp)
+                    if (LayerKey != CELayer.Layer7A && LayerKey != CELayer.Layer7B && LayerKey != CELayer.Layer7C && LayerKey != CELayer.Layer7D && LayerKey != CELayer.Layer7E)
                     {
-                        HasChanged = true;
-                        CELayerWalkEntry tmp = Layer[i + 1];
-                        Layer[i + 1] = Layer[i];
-                        Layer[i] = tmp;
+                        FullSortCDA(LayerMap[LayerKey]);
                     }
-                }
-            } while (HasChanged);
-        }
-
-        //Bubblesorts by timestamp,prioritizing CDA effects
-        private void SortLayerCDA(List<CELayerWalkEntry> Layer)
-        {
-            List<CELayerWalkEntry> CDAEffects = new List<CELayerWalkEntry>();
-            List<CELayerWalkEntry> OtherEffects = new List<CELayerWalkEntry>();
-
-            foreach (CELayerWalkEntry Entry in Layer)
-            {
-                if (Entry.IsCDA)
-                {
-                    CDAEffects.Add(Entry);
-                }
-                else
-                {
-                    OtherEffects.Add(Entry);
-                }
-            }
-
-            bool HasChanged = false;
-
-            do
-            {
-                HasChanged = false;
-                for (int i = 0; i < CDAEffects.Count - 1; i++)
-                {
-                    if (CDAEffects[i].CardSrc.Timestamp > CDAEffects[i + 1].CardSrc.Timestamp)
+                    else
                     {
-                        HasChanged = true;
-                        CELayerWalkEntry tmp = CDAEffects[i];
-                        CDAEffects[i] = CDAEffects[i + 1];
-                        CDAEffects[i + 1] = tmp;
-                    }
-                }
-            } while (HasChanged);
-
-            do
-            {
-                HasChanged = false;
-                for (int i = 0; i < OtherEffects.Count - 1; i++)
-                {
-                    if (OtherEffects[i].CardSrc.Timestamp > OtherEffects[i + 1].CardSrc.Timestamp)
-                    {
-                        HasChanged = true;
-                        CELayerWalkEntry tmp = OtherEffects[i];
-                        OtherEffects[i] = OtherEffects[i + 1];
-                        OtherEffects[i + 1] = tmp;
-                    }
-                }
-            } while (HasChanged);
-
-            Layer.Clear();
-
-            Layer.AddRange(CDAEffects);
-            Layer.AddRange(OtherEffects);
-        }
-
-        internal void SortLayerDependency(List<CELayerEntry> Layer)
-        {
-            List<CELayerEntry> SortByTimestamp = new List<CELayerEntry>();
-            List<List<int>> DependsOn = new List<List<int>>();
-            for (int i = 0; i < Layer.Count; i++)
-            {
-                DependsOn.Add(new List<int>());
-            }
-
-            for (int PrimEntryNum = 0; PrimEntryNum < Layer.Count; PrimEntryNum++)
-            {
-                foreach (FieldInfo PrimFI in Layer[PrimEntryNum].DependsOnFields)
-                {
-                    for (int SecEntryNum = 0; SecEntryNum < Layer.Count; SecEntryNum++)
-                    {
-                        foreach (FieldInfo SecFI in Layer[SecEntryNum].ChangingFields)
-                        {
-                            if (PrimFI.Name == SecFI.Name)
-                            {
-                                DependsOn[PrimEntryNum].Add(SecEntryNum);
-                            }
-                        }
+                        FullSort(LayerMap[LayerKey]);
                     }
                 }
             }
@@ -195,15 +121,106 @@ namespace Sharpening
                     c.LandChangeOperations.Clear();
                     c.ColorChangeOperations.Clear();
                     c.TypeChangeOperations.Clear();
-                    c.Characteristics.ActualPower = c.Characteristics.BasePower;
-                    c.Characteristics.ActualToughness = c.Characteristics.BaseToughness;
+                    c.CurrentCharacteristics = c.BaseCharacteristics.Copy();
                 }
             }
+            
+            RunLayer(Layer1);
+            RunLayer(Layer2);
+            RunLayer(Layer3);
+            RunLayer(Layer4);
+            RunLayer(Layer5);
+            RunLayer(Layer6);
+            RunLayer(Layer7A);
+            RunLayer(Layer7B);
+            RunLayer(Layer7C);
+            RunLayer(Layer7D);
+            RunLayer(Layer7E);
+        }
+        
+        private void RunLayer(List<CELayerWalkEntry> Layer)
+        {
+            foreach(CELayerWalkEntry CELWE in Layer)
+            {
+            	if(CELWE.CardTgt == null)
+            	{
+            		foreach(Player p in InvolvedGame.Players)
+            		{
+            			foreach(CardBase Card in p.OwnedCards)
+            			{
+            				if(CELWE.AppliesTo(Card))
+            				{
+            					CELWE.MyEffect(Card);
+            				}
+            			}
+            		}
+            	}
+            	else
+            	{
+            		if(CELWE.AppliesTo(CELWE.CardTgt))
+            		{
+            			CELWE.MyEffect(CELWE.CardTgt);
+            		}
+            	}
+            }
+        }
+        
+        //Combines all sorting methods, doesn't care about CDA effects
+        private void FullSort(List<CELayerWalkEntry> Layer)
+        {
+        	SortListByDependency(Layer);
         }
 
-        internal void SortDependency(ref List<CELayerWalkEntry> Layer)
+        //Combines all sorting methods but prioritizes CDA effects
+        private void FullSortCDA(List<CELayerWalkEntry> Layer)
         {
-            int EntryNum = Layer.Count;
+        	List<CELayerWalkEntry> CDAs = new List<CELayerWalkEntry>();
+        	List<CELayerWalkEntry> Others = new List<CELayerWalkEntry>();
+        	
+        	foreach(CELayerWalkEntry CELWE in Layer)
+        	{
+        		if(CELWE.IsCDA)
+        		{
+        			CDAs.Add(CELWE);
+        		}
+        		else
+        		{
+        			Others.Add(CELWE);
+        		}
+        	}
+        	
+        	SortListByTimestamp(CDAs);
+        	
+        	SortListByDependency(Others);
+        	
+        	Layer.Clear();
+        	Layer.AddRange(CDAs.ToArray());
+        	Layer.AddRange(Others.ToArray());        	
+        }
+        
+        //Bubblesorts by timestamp
+        private void SortListByTimestamp(List<CELayerWalkEntry> Layer)
+        {
+            bool HasChanged = false;
+            do	
+            {
+                HasChanged = false;
+                for (int i = 0; i < Layer.Count - 1; i++)
+                {
+                    if (Layer[i].CardSrc.Timestamp > Layer[i + 1].CardSrc.Timestamp)
+                    {
+                        HasChanged = true;
+                        CELayerWalkEntry tmp = Layer[i + 1];
+                        Layer[i + 1] = Layer[i];
+                        Layer[i] = tmp;
+                    }
+                }
+            } while (HasChanged);
+        }
+        
+        //Sorts by dependency
+        private void SortListByDependency(List<CELayerWalkEntry> Layer)
+        {
             //First, determine all "bonds" between entries. I.e. who depends on who?
             for (int i = 0; i < Layer.Count; i++)
             {
@@ -215,7 +232,7 @@ namespace Sharpening
                         {
                             foreach (FieldInfo FI2 in Layer[j].TargetFields)
                             {
-                                if (FI1 == FI2)
+                                if (FI1.Name == FI2.Name)
                                 {
                                     Layer[i].DependsOn.Add(Layer[j]);
                                     Layer[j].Dependants.Add(Layer[i]);
@@ -228,7 +245,7 @@ namespace Sharpening
 
             List<CELayerWalkEntry> Final = new List<CELayerWalkEntry>();
 
-            while (Final.Count < EntryNum)
+            while (Layer.Count != 0)
             {
                 //While there are entries without DependsOn entries, add those to output in timestamp order
                 List<CELayerWalkEntry> NoDependencies = new List<CELayerWalkEntry>();
@@ -257,14 +274,19 @@ namespace Sharpening
                     CELWE.Visited = false;
                 }
 
-                SortLayer(NoDependencies); //TODO: Change SortLayer.
+                SortListByTimestamp(NoDependencies);
                 Final.AddRange(NoDependencies.ToArray());
+                
+                if(Layer.Count == 0) //We've already sorted all necessary effects, no need to walk.
+                {
+                	break;
+                }
 
                 //Walk the tree to detect and take care of circular dependencies
                 List<CELayerWalkEntry> CircularDependency = new List<CELayerWalkEntry>();
                 if (WalkDependencyTree(Layer[0], CircularDependency))
                 {
-                    SortLayer(CircularDependency); //TODO: Change SortLayer.
+                    SortListByTimestamp(CircularDependency);
                     Final.AddRange(CircularDependency.ToArray());
                     foreach (CELayerWalkEntry CELWE1 in CircularDependency)
                     {
@@ -278,10 +300,12 @@ namespace Sharpening
                 }
             }
 
-            Layer = Final;
+            Layer.Clear();
+            Layer.AddRange(Final.ToArray());
         }
 
-        internal bool WalkDependencyTree(CELayerWalkEntry StartPoint, List<CELayerWalkEntry> CircDepList)
+        //Helper to SortListByDependency, solves dependency loops.
+        private bool WalkDependencyTree(CELayerWalkEntry StartPoint, List<CELayerWalkEntry> CircDepList)
         {
             foreach (CELayerWalkEntry CELWE in StartPoint.Dependants)
             {

@@ -41,9 +41,9 @@
     <Compile Include="ActivatableSystem\CostFactory.cs" />
     <Compile Include="CardBase.cs" />
     <Compile Include="CardCompiler.cs" />
+    <Compile Include="Cards\GloriousAnthem.cs" />
     <Compile Include="Cards\Plains.cs" />
     <Compile Include="CharacteristicsCollection.cs" />
-    <Compile Include="Layersystem\CELayerEntry.cs" />
     <Compile Include="Layersystem\CELayerSystem.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="InputStateFactory.cs" />
