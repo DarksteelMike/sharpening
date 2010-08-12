@@ -35,6 +35,16 @@ namespace Sharpening
         {
             get { return cardSrc; }
         }
+        private CardBase cardTgt;
+        internal CardBase CardTgt
+        {
+        	get { return cardTgt; }
+        }
+        private Condition appliesTo;
+        internal Condition AppliesTo
+        {
+        	get { return appliesTo; }
+        }
         private bool isCDA;
         internal bool IsCDA
         {

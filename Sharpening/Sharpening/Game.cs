@@ -114,7 +114,11 @@ namespace Sharpening
                 }
                 else
                 {
-                    spellStack.Pop().Resolve();
+                	Spell popped = spellStack.Pop();
+                	if(popped.CanResolve())
+                	{
+                		popped.Resolve();
+                	}
                 }
             }
             else

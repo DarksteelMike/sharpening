@@ -27,7 +27,7 @@ namespace Sharpening
 
         internal bool HasSupertype(string Supertype)
         {
-            foreach (string s in characteristics.Supertypes)
+            foreach (string s in currentCharacteristics.Supertypes)
             {
                 if (Supertype == GetFinalText(s, typeChangeOperations))
                 {
@@ -40,7 +40,7 @@ namespace Sharpening
 
         internal bool HasType(string Type)
         {
-            foreach (string s in characteristics.Types)
+            foreach (string s in currentCharacteristics.Types)
             {
                 if (Type == GetFinalText(s, typeChangeOperations))
                 {
@@ -53,7 +53,7 @@ namespace Sharpening
 
         internal bool HasSubType(string Subtype)
         {
-            foreach (string s in characteristics.Subtypes)
+            foreach (string s in currentCharacteristics.Subtypes)
             {
                 if (Subtype == GetFinalText(s, typeChangeOperations))
                 {
@@ -129,16 +129,25 @@ namespace Sharpening
             get { return activatables; }
         }
 
-        protected CharacteristicsCollection characteristics;
-        internal CharacteristicsCollection Characteristics
+        protected CharacteristicsCollection baseCharacteristics;
+        internal CharacteristicsCollection BaseCharacteristics
         {
-            get { return characteristics; }
+            get { return baseCharacteristics; }
+        }
+        protected CharacteristicsCollection currentCharacteristics;
+        internal CharacteristicsCollection CurrentCharacteristics
+        {
+        	get { return currentCharacteristics; }
+        	set { currentCharacteristics = value; }
         }
 
         internal CardBase(Game g)
         {
             InvolvedGame = g;
             cardID = CardBase.NextCardID;
+            
+            baseCharacteristics = new CharacteristicsCollection();
+            currentCharacteristics = new CharacteristicsCollection();
 
             typeChangeOperations = new List<TextChangeOperation>();
             colorChangeOperations = new List<TextChangeOperation>();
@@ -174,55 +183,55 @@ namespace Sharpening
 
         internal void Move(CardLocation Target)
         {
-            characteristics.PreviousLocation = characteristics.Location;
-            characteristics.Location = Target;
+            currentCharacteristics.PreviousLocation = currentCharacteristics.Location;
+            currentCharacteristics.Location = Target;
 
-            if (characteristics.PreviousLocation == CardLocation.Battlefield)
+            if (currentCharacteristics.PreviousLocation == CardLocation.Battlefield)
             {
                 LeavesBattlefield.Run();
             }
 
             //Remove card from appropriate list
-            switch (characteristics.PreviousLocation)
+            switch (currentCharacteristics.PreviousLocation)
             {
                 case (CardLocation.Library):
-                    characteristics.Controller.LibraryCards.Remove(this);
+                    currentCharacteristics.Controller.LibraryCards.Remove(this);
                     break;
                 case (CardLocation.Hand):
-                    characteristics.Controller.HandCards.Remove(this);
+                    currentCharacteristics.Controller.HandCards.Remove(this);
                     break;
                 case (CardLocation.Battlefield):
-                    characteristics.Controller.BattlefieldCards.Remove(this);
+                    currentCharacteristics.Controller.BattlefieldCards.Remove(this);
                     LeavesBattlefield.Run();
                     break;
                 case (CardLocation.Graveyard):
-                    characteristics.Controller.GraveyardCards.Remove(this);
+                    currentCharacteristics.Controller.GraveyardCards.Remove(this);
                     LeavesGraveyard.Run();
                     break;
                 case (CardLocation.Exile):
-                    characteristics.Controller.ExileCards.Remove(this);
+                    currentCharacteristics.Controller.ExileCards.Remove(this);
                     break;
             }
 
             //Add card to appropriate list
-            switch (characteristics.Location)
+            switch (currentCharacteristics.Location)
             {
                 case (CardLocation.Library):
-                    characteristics.Owner.LibraryCards.Add(this);
+                    currentCharacteristics.Owner.LibraryCards.Add(this);
                     break;
                 case (CardLocation.Hand):
-                    characteristics.Owner.HandCards.Add(this);
+                    currentCharacteristics.Owner.HandCards.Add(this);
                     break;
                 case (CardLocation.Battlefield):
-                    characteristics.Controller.BattlefieldCards.Add(this);
+                    currentCharacteristics.Controller.BattlefieldCards.Add(this);
                     EntersBattlefield.Run();
                     break;
                 case (CardLocation.Graveyard):
-                    characteristics.Owner.GraveyardCards.Add(this);
+                    currentCharacteristics.Owner.GraveyardCards.Add(this);
                     EntersGraveyard.Run();
                     break;
                 case (CardLocation.Exile):
-                    characteristics.Owner.ExileCards.Add(this);
+                    currentCharacteristics.Owner.ExileCards.Add(this);
                     break;
             }
         }
