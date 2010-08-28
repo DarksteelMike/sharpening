@@ -13,36 +13,36 @@ namespace Sharpening
     internal class CELayerSystem
     {
         private Game InvolvedGame;
-        private List<CELayerWalkEntry> Layer1; //Copy CELayerEntrys
-        private List<CELayerWalkEntry> Layer2; //Control-changing CELayerEntrys
-        private List<CELayerWalkEntry> Layer3; //Text-changing CELayerEntrys
-        private List<CELayerWalkEntry> Layer4; //Type-changing CELayerEntrys
-        private List<CELayerWalkEntry> Layer5; //Color-changing CELayerEntrys
-        private List<CELayerWalkEntry> Layer6; //Ability-changing CELayerEntrys
-        private List<CELayerWalkEntry> Layer7A; //P/T CDAs
-        private List<CELayerWalkEntry> Layer7B; //Specifically setting P/T CELayerEntrys
-        private List<CELayerWalkEntry> Layer7C; //Static abilities that modify but do not specifically set P/T
-        private List<CELayerWalkEntry> Layer7D; //Counters
-        private List<CELayerWalkEntry> Layer7E; //CELayerEntrys that switch P/T
+        private List<CELayerEntry> Layer1; //Copy CELayerEntrys
+        private List<CELayerEntry> Layer2; //Control-changing CELayerEntrys
+        private List<CELayerEntry> Layer3; //Text-changing CELayerEntrys
+        private List<CELayerEntry> Layer4; //Type-changing CELayerEntrys
+        private List<CELayerEntry> Layer5; //Color-changing CELayerEntrys
+        private List<CELayerEntry> Layer6; //Ability-changing CELayerEntrys
+        private List<CELayerEntry> Layer7A; //P/T CDAs
+        private List<CELayerEntry> Layer7B; //Specifically setting P/T CELayerEntrys
+        private List<CELayerEntry> Layer7C; //Static abilities that modify but do not specifically set P/T
+        private List<CELayerEntry> Layer7D; //Counters
+        private List<CELayerEntry> Layer7E; //CELayerEntrys that switch P/T
 
-        private Dictionary<CELayer, List<CELayerWalkEntry>> LayerMap;
+        private Dictionary<CELayer, List<CELayerEntry>> LayerMap;
 
         internal CELayerSystem(Game g)
         {
             InvolvedGame = g;
-            Layer1 = new List<CELayerWalkEntry>();
-            Layer2 = new List<CELayerWalkEntry>();
-            Layer3 = new List<CELayerWalkEntry>();
-            Layer4 = new List<CELayerWalkEntry>();
-            Layer5 = new List<CELayerWalkEntry>();
-            Layer6 = new List<CELayerWalkEntry>();
-            Layer7A = new List<CELayerWalkEntry>();
-            Layer7B = new List<CELayerWalkEntry>();
-            Layer7C = new List<CELayerWalkEntry>();
-            Layer7D = new List<CELayerWalkEntry>();
-            Layer7E = new List<CELayerWalkEntry>();
+            Layer1 = new List<CELayerEntry>();
+            Layer2 = new List<CELayerEntry>();
+            Layer3 = new List<CELayerEntry>();
+            Layer4 = new List<CELayerEntry>();
+            Layer5 = new List<CELayerEntry>();
+            Layer6 = new List<CELayerEntry>();
+            Layer7A = new List<CELayerEntry>();
+            Layer7B = new List<CELayerEntry>();
+            Layer7C = new List<CELayerEntry>();
+            Layer7D = new List<CELayerEntry>();
+            Layer7E = new List<CELayerEntry>();
 
-            LayerMap = new Dictionary<CELayer, List<CELayerWalkEntry>>();
+            LayerMap = new Dictionary<CELayer, List<CELayerEntry>>();
             LayerMap.Add(CELayer.Layer1, Layer1);
             LayerMap.Add(CELayer.Layer2, Layer2);
             LayerMap.Add(CELayer.Layer3, Layer3);
@@ -56,7 +56,7 @@ namespace Sharpening
             LayerMap.Add(CELayer.Layer7E, Layer7E);
         }
 
-        internal void AddEntry(CELayer Layer, CELayerWalkEntry Entry)
+        internal void AddEntry(CELayer Layer, CELayerEntry Entry)
         {
             LayerMap[Layer].Add(Entry);
             if (Layer != CELayer.Layer7A && Layer != CELayer.Layer7B && Layer != CELayer.Layer7C && Layer != CELayer.Layer7D && Layer != CELayer.Layer7E)
@@ -86,7 +86,7 @@ namespace Sharpening
         	
             foreach (CELayer LayerKey in LayerMap.Keys)
             {
-                foreach (CELayerWalkEntry Entry in LayerMap[LayerKey])
+                foreach (CELayerEntry Entry in LayerMap[LayerKey])
                 {
                     if (Entry.CardSrc.CardID == Card.CardID)
                     {
@@ -138,9 +138,9 @@ namespace Sharpening
             RunLayer(Layer7E);
         }
         
-        private void RunLayer(List<CELayerWalkEntry> Layer)
+        private void RunLayer(List<CELayerEntry> Layer)
         {
-            foreach(CELayerWalkEntry CELWE in Layer)
+            foreach(CELayerEntry CELWE in Layer)
             {
             	if(CELWE.CardTgt == null)
             	{
@@ -166,18 +166,18 @@ namespace Sharpening
         }
         
         //Combines all sorting methods, doesn't care about CDA effects
-        private void FullSort(List<CELayerWalkEntry> Layer)
+        private void FullSort(List<CELayerEntry> Layer)
         {
         	SortListByDependency(Layer);
         }
 
         //Combines all sorting methods but prioritizes CDA effects
-        private void FullSortCDA(List<CELayerWalkEntry> Layer)
+        private void FullSortCDA(List<CELayerEntry> Layer)
         {
-        	List<CELayerWalkEntry> CDAs = new List<CELayerWalkEntry>();
-        	List<CELayerWalkEntry> Others = new List<CELayerWalkEntry>();
+        	List<CELayerEntry> CDAs = new List<CELayerEntry>();
+        	List<CELayerEntry> Others = new List<CELayerEntry>();
         	
-        	foreach(CELayerWalkEntry CELWE in Layer)
+        	foreach(CELayerEntry CELWE in Layer)
         	{
         		if(CELWE.IsCDA)
         		{
@@ -199,7 +199,7 @@ namespace Sharpening
         }
         
         //Bubblesorts by timestamp
-        private void SortListByTimestamp(List<CELayerWalkEntry> Layer)
+        private void SortListByTimestamp(List<CELayerEntry> Layer)
         {
             bool HasChanged = false;
             do	
@@ -210,7 +210,7 @@ namespace Sharpening
                     if (Layer[i].CardSrc.Timestamp > Layer[i + 1].CardSrc.Timestamp)
                     {
                         HasChanged = true;
-                        CELayerWalkEntry tmp = Layer[i + 1];
+                        CELayerEntry tmp = Layer[i + 1];
                         Layer[i + 1] = Layer[i];
                         Layer[i] = tmp;
                     }
@@ -219,7 +219,7 @@ namespace Sharpening
         }
         
         //Sorts by dependency
-        private void SortListByDependency(List<CELayerWalkEntry> Layer)
+        private void SortListByDependency(List<CELayerEntry> Layer)
         {
             //First, determine all "bonds" between entries. I.e. who depends on who?
             for (int i = 0; i < Layer.Count; i++)
@@ -243,21 +243,21 @@ namespace Sharpening
                 }
             }
 
-            List<CELayerWalkEntry> Final = new List<CELayerWalkEntry>();
+            List<CELayerEntry> Final = new List<CELayerEntry>();
 
             while (Layer.Count != 0)
             {
                 //While there are entries without DependsOn entries, add those to output in timestamp order
-                List<CELayerWalkEntry> NoDependencies = new List<CELayerWalkEntry>();
+                List<CELayerEntry> NoDependencies = new List<CELayerEntry>();
                 bool EntriesCanBeCulled = true;
                 while (EntriesCanBeCulled)
                 {
                     EntriesCanBeCulled = false;
-                    foreach (CELayerWalkEntry CELWE in Layer)
+                    foreach (CELayerEntry CELWE in Layer)
                     {
                         if (CELWE.DependsOn.Count == 0)
                         {
-                            foreach (CELayerWalkEntry CELWE2 in Layer)
+                            foreach (CELayerEntry CELWE2 in Layer)
                             {
                                 CELWE2.Dependants.Remove(CELWE);
                                 CELWE2.DependsOn.Remove(CELWE);
@@ -269,7 +269,7 @@ namespace Sharpening
                     }
                 }
 
-                foreach (CELayerWalkEntry CELWE in Layer)
+                foreach (CELayerEntry CELWE in Layer)
                 {
                     CELWE.Visited = false;
                 }
@@ -283,14 +283,14 @@ namespace Sharpening
                 }
 
                 //Walk the tree to detect and take care of circular dependencies
-                List<CELayerWalkEntry> CircularDependency = new List<CELayerWalkEntry>();
+                List<CELayerEntry> CircularDependency = new List<CELayerEntry>();
                 if (WalkDependencyTree(Layer[0], CircularDependency))
                 {
                     SortListByTimestamp(CircularDependency);
                     Final.AddRange(CircularDependency.ToArray());
-                    foreach (CELayerWalkEntry CELWE1 in CircularDependency)
+                    foreach (CELayerEntry CELWE1 in CircularDependency)
                     {
-                        foreach (CELayerWalkEntry CELWE2 in Layer)
+                        foreach (CELayerEntry CELWE2 in Layer)
                         {
                             CELWE2.Dependants.Remove(CELWE1);
                             CELWE2.DependsOn.Remove(CELWE1);
@@ -305,9 +305,9 @@ namespace Sharpening
         }
 
         //Helper to SortListByDependency, solves dependency loops.
-        private bool WalkDependencyTree(CELayerWalkEntry StartPoint, List<CELayerWalkEntry> CircDepList)
+        private bool WalkDependencyTree(CELayerEntry StartPoint, List<CELayerEntry> CircDepList)
         {
-            foreach (CELayerWalkEntry CELWE in StartPoint.Dependants)
+            foreach (CELayerEntry CELWE in StartPoint.Dependants)
             {
                 if (CELWE.Visited) //We've been here already! Climb back up the tree and add all passed nodes to the Circular Dependency List
                 {

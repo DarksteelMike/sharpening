@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Sharpening
 {
+    internal delegate void CardMovedEventHandler(CardMovedEventArgs e);
     internal abstract class CardBase
     {
         protected Game InvolvedGame;
@@ -109,6 +110,12 @@ namespace Sharpening
         internal string Name
         {
             get { return name; }
+        }
+        
+        protected bool autoUntaps;
+        internal bool AutoUntaps
+        {
+        	get { return autoUntaps; }
         }
 
         protected ReplacableEvent Destroyed;

@@ -18,6 +18,7 @@ namespace Sharpening
             Params.GenerateExecutable = false;
             Params.GenerateInMemory = true;
             //Params.ReferencedAssemblies.Add("..\\Sharpening.dll");
+            Params.ReferencedAssemblies.Add(System.Reflection.Assembly.GetExecutingAssembly().FullName); //?
             Params.ReferencedAssemblies.Add("System.dll");
             
 
@@ -64,7 +65,7 @@ namespace Sharpening
             foreach (string s in CardNames)
             {
                 string CleanName = Utility.CreateValidClassName(s);
-                CompiledCards.Add((CardBase)Result.CompiledAssembly.CreateInstance("Cards.", false));
+                CompiledCards.Add((CardBase)Result.CompiledAssembly.CreateInstance("Cards." + CleanName, false));
             }
 
             return CompiledCards;

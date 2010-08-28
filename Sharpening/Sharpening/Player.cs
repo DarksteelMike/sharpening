@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sharpening
 {
-    public enum CardLocation { Library, Hand, Battlefield, Graveyard, Exile };
+    public enum CardLocation { Library, Hand, Battlefield, Graveyard, Exile, Command };
 
     internal class Player
     {
@@ -87,6 +87,12 @@ namespace Sharpening
         internal List<CardBase> OwnedCards
         {
             get { return ownedCards; }
+        }
+        
+        private List<CardBase> commandCards;
+        internal List<CardBase> CommandCards
+        {
+        	get { return commandCards; }
         }
 
         private ManaPool myPool;

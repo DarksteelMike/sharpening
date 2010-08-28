@@ -10,12 +10,52 @@ namespace Sharpening
         internal static Activatable Create(Game g, CardBase TargetCard, string ActivatableType)
         {
             bool NewIsManaAbility = false;
+            bool NewIsCastingAbility = false;
             Condition NewCondition = null;
             CompoundCost NewCost = null;
             CompoundEffect NewEffect = null;
             string NewDescription = null;
 
-            if (ActivatableType.StartsWith("PlayLand"))
+            if(ActivatableType.StartsWith("CastPermanent"))
+            {
+            	Effect SpellEffect = new Effect(delegate(object[] param)
+            	{
+            		TargetCard.Move(CardLocation.Battlefield);
+            	});
+            	Spell StackEntry = new Spell(TargetCard,SpellEffect,TargetCard.Name);
+            	
+            	NewCondition = new Condition(delegate(object[] param)
+                {
+                    bool Result;
+
+                    //Is it our controllers turn?
+                    Result = g.Players[g.WhoseTurn] == TargetCard.CurrentCharacteristics.Controller;
+
+                    //Are we in the hand?
+                    Result = Result && (TargetCard.CurrentCharacteristics.Location == CardLocation.Hand);
+
+                    return Result;
+
+                });
+            	
+            	NewEffect = new CompoundEffect(new Effect(delegate(object[] target)
+                {
+            		g.PushSpell(StackEntry);
+                }));
+
+            	List<Cost> Costs = new List<Cost>();
+            	foreach(string indivcost in ActivatableType.Split(':')[1].Split(','))
+            	{
+            		Costs.Add(CostFactory.Create(g,indivcost));
+            	}
+            	NewCost = new CompoundCost(Costs.ToArray());
+
+                NewDescription = "";
+
+                NewIsManaAbility = false;
+                NewIsCastingAbility = true;
+            }
+            else if (ActivatableType.StartsWith("PlayLand"))
             {
                 //Create a casting Activatable
                 NewCondition = new Condition(delegate(object[] param)
@@ -46,11 +86,14 @@ namespace Sharpening
                 NewDescription = "";
 
                 NewIsManaAbility = false;
+                NewIsCastingAbility = true;
             }
             else if (ActivatableType.StartsWith("Flashback:"))
             {
                 //Flashback is not a mana ability
                 NewIsManaAbility = false;
+                
+                NewIsCastingAbility = true;
 
                 //Can only be activated when in the graveyard
                 NewCondition = delegate(object[] param)
@@ -83,7 +126,36 @@ namespace Sharpening
                 AllEffects.Add(AddedEffect);
                 NewEffect = new CompoundEffect(AllEffects.ToArray());
             }
-            else if (ActivatableType.StartsWith("Manatap:"))
+            else if (ActivatableType.StartsWith("Suspend"))
+            {
+            	NewIsManaAbility = false;
+            	
+            	NewCondition = delegate(object[] param)
+                {
+                    return TargetCard.CurrentCharacteristics.Location == CardLocation.Hand;
+                };
+            	
+            	//Construct the cost
+                string FullCost = ActivatableType.Split(':')[1];
+                string[] Costs = FullCost.Split('+');
+
+                List<Cost> SingleCosts = new List<Cost>();
+                foreach (string s in Costs)
+                {
+                    SingleCosts.Add(CostFactory.Create(g, s));
+                }
+                NewCost = new CompoundCost(SingleCosts.ToArray());
+                
+                NewEffect = new CompoundEffect(new Effect(delegate(object[] param) {
+                                                          	TargetCard.Move(CardLocation.Exile);
+                                                          	for(int i=0;i<int.Parse(ActivatableType.Split(':')[2]);i++)
+                                                          	{
+                                                          		TargetCard.CurrentCharacteristics.Counters.Add("Time");
+                                                          	}
+                                                          }));
+                 
+            }
+            else if (ActivatableType.StartsWith("Manatap"))
             {
                 //It's a mana ability
                 NewIsManaAbility = true;
@@ -124,7 +196,7 @@ namespace Sharpening
                 NewDescription += "tap: Add " + ManaMade + " to your manapool.";
             }
 
-            return new Activatable(TargetCard, NewIsManaAbility, NewCost, NewCondition, NewEffect, NewDescription);
+            return new Activatable(TargetCard, NewIsManaAbility, NewIsCastingAbility, NewCost, NewCondition, NewEffect, NewDescription);
         }
     }
 }

@@ -14,7 +14,22 @@ namespace Sharpening
         {
             foreach (EffectSchedulerEntry Entry in Entries)
             {
-                if (Entry.WaitingFor_Phase == ThePhase && (Entry.WaitingFor_Player == CurPlayer || Entry.WaitingFor_Player == null))
+                if (Entry.WaitingFor_Phase == ThePhase && (Entry.WaitingFor_Player == CurPlayer || Entry.WaitingFor_Player == null) && Entry.WaitingFor_PhasePart == PhasePart.Beginning)
+                {
+                    Entry.Run();
+                    if (Entry.RemoveAfterRun)
+                    {
+                        Entries.Remove(Entry);
+                    }
+                }
+            }
+        }
+        
+        internal void LeavingPhase(Phase ThePhase,Player CurPlayer)
+        {
+        	foreach (EffectSchedulerEntry Entry in Entries)
+            {
+                if (Entry.WaitingFor_Phase == ThePhase && (Entry.WaitingFor_Player == CurPlayer || Entry.WaitingFor_Player == null) && Entry.WaitingFor_PhasePart == PhasePart.End)
                 {
                     Entry.Run();
                     if (Entry.RemoveAfterRun)

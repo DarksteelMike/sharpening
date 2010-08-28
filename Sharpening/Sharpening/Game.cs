@@ -7,9 +7,24 @@ namespace Sharpening
 {
     internal class Game
     {
-        StateBasedEffectSystem SBESystem;
-        EffectScheduler SchedulingSystem;
-        CELayerSystem LayerSystem;
+        private StateBasedEffectSystem stateBasedEffects;
+        internal StateBasedEffectSystem StateBasedEffects
+        {
+        	get { return stateBasedEffects; }
+        }
+        
+        private EffectScheduler schedulingSystem;
+        internal EffectScheduler SchedulingSystem
+        {
+        	get { return schedulingSystem; }
+        }
+        
+        private CELayerSystem layerSystem;
+        internal CELayerSystem LayerSystem
+        {
+        	get { return layerSystem; }
+        }
+        
 
         private List<IUserInterfaceBridge> userInterfaces;
         internal List<IUserInterfaceBridge> UserInterfaces
@@ -78,9 +93,9 @@ namespace Sharpening
             userInterfaces = new List<IUserInterfaceBridge>();
             userInterfaces.AddRange(UI.ToArray());
 
-            SBESystem = new StateBasedEffectSystem(this);
-            SchedulingSystem = new EffectScheduler();
-            LayerSystem = new CELayerSystem(this);
+            stateBasedEffects = new StateBasedEffectSystem(this);
+            schedulingSystem = new EffectScheduler();
+            layerSystem = new CELayerSystem(this);
 
             players = new List<Player>();
             players.Add(new Player(0,this));
@@ -89,11 +104,47 @@ namespace Sharpening
             priority = whoseTurn = 0;
 
             currentPhase = Phase.Main1;
+            
+            Effect UntapEffect = new Effect(delegate (object[] param) 
+                                            {
+                                            	foreach(CardBase Card in players[whoseTurn].BattlefieldCards)
+                                                {
+                                                	if(Card.AutoUntaps)
+                                                    {
+                                                    	Card.CurrentCharacteristics.IsTapped = false;
+                                                    }
+                                                }
+                                            });
+            
+            Effect DrawEffect = new Effect(delegate(object[] param)
+                                           {
+                                           		//Draw code here.
+                                           });
+            Effect CleanupEffect = new Effect(delegate(object[] param)
+                                              {
+                                              	while(players[whoseTurn].HandCards.Count > players[whoseTurn].MaximumHandSize)
+                                              	{
+                                              		//Set the correct input state for discard.
+                                              	}
+                                              });
+            EffectSchedulerEntry UntapESC1 = new EffectSchedulerEntry(UntapEffect, null, players[0], Phase.Untap, PhasePart.End,false);
+            EffectSchedulerEntry UntapESC2 = new EffectSchedulerEntry(UntapEffect, null, players[1], Phase.Untap, PhasePart.End,false);
+            EffectSchedulerEntry DrawESC1 = new EffectSchedulerEntry(DrawEffect, null, players[0], Phase.Draw, PhasePart.Beginning,false);
+            EffectSchedulerEntry DrawESC2 = new EffectSchedulerEntry(DrawEffect, null, players[1], Phase.Draw, PhasePart.Beginning,false);
+            EffectSchedulerEntry CleanupESC1 = new EffectSchedulerEntry(CleanupEffect, null, players[0], Phase.Cleanup, PhasePart.Beginning,false);
+            EffectSchedulerEntry CleanupESC2 = new EffectSchedulerEntry(CleanupEffect, null, players[1], Phase.Cleanup, PhasePart.Beginning,false);
+            
+            schedulingSystem.AddEntry(UntapESC1);
+            schedulingSystem.AddEntry(UntapESC2);
+            schedulingSystem.AddEntry(DrawESC1);
+            schedulingSystem.AddEntry(DrawESC2);
+            schedulingSystem.AddEntry(CleanupESC1);
+            schedulingSystem.AddEntry(CleanupESC2);
         }
 
         internal void PassPriority()
         {
-            SBESystem.Run();
+            stateBasedEffects.Run();
 
             priority = 1 - priority;
             if (ActionStack.Peek() == "Pass" || ActionStack.Count == 0)
@@ -109,11 +160,13 @@ namespace Sharpening
                         whoseTurn = 1 - whoseTurn;
                     }
 
+                    schedulingSystem.LeavingPhase(currentPhase,players[whoseTurn]);
                     currentPhase = (Phase)a.GetValue(phaseNum);
+                    schedulingSystem.EnteredPhase(currentPhase,players[whoseTurn]);
                     //Both players passed in succession,go to next phase
                 }
                 else
-                {
+                {                	
                 	Spell popped = spellStack.Pop();
                 	if(popped.CanResolve())
                 	{

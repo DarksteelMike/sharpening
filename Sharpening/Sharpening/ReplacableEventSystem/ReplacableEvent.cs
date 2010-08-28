@@ -11,11 +11,16 @@ namespace Sharpening
     internal class ReplacableEvent
     {
         private Effect StandardEffect;
-        private List<ReplacingEvent> ReplacingEvents;
+        
+        private List<ReplacingEvent> replacingEvents;
+        internal List<ReplacingEvent> ReplacingEvents
+        {
+        	get { return replacingEvents; }
+        }
 
         internal void Run(params object[] param)
         {
-            if (ReplacingEvents.Count == 0)
+            if (replacingEvents.Count == 0)
             {
                 StandardEffect(param);
             }
@@ -24,16 +29,16 @@ namespace Sharpening
                 int MostRecentTimestamp = -1;
                 int MRTAt = -1;
 
-                for (int i = 0; i < ReplacingEvents.Count; i++)
+                for (int i = 0; i < replacingEvents.Count; i++)
                 {
-                    if (ReplacingEvents[i].CardSrc.Timestamp > MostRecentTimestamp)
+                    if (replacingEvents[i].CardSrc.Timestamp > MostRecentTimestamp)
                     {
-                        MostRecentTimestamp = ReplacingEvents[i].CardSrc.Timestamp;
+                        MostRecentTimestamp = replacingEvents[i].CardSrc.Timestamp;
                         MRTAt = i;
                     }
                 }
 
-                ReplacingEvents[MRTAt].Run(param);
+                replacingEvents[MRTAt].Run(param);
             }
         }
 
@@ -45,7 +50,7 @@ namespace Sharpening
         internal ReplacableEvent(Effect MyEffect)
         {
             StandardEffect = MyEffect;
-            ReplacingEvents = new List<ReplacingEvent>();
+            replacingEvents = new List<ReplacingEvent>();
         }
     }
 }

@@ -36,13 +36,15 @@ namespace Sharpening
         private int power;
         internal int Power
         {
-            get { return Power; }
+            get { return power; }
+            set { power = value; }
         }
 
         private int toughness;
         internal int Toughness
         {
-            get { return Toughness; }
+            get { return toughness; }
+            set { toughness = value; }
         }
 
         private int assignedDamage;
@@ -88,8 +90,8 @@ namespace Sharpening
         	get { return keywords; }
         }
         
-        private string color;
-        internal string Color
+        private List<string> color;
+        internal List<string> Color
         {
         	get { return color; }
         }
@@ -101,6 +103,7 @@ namespace Sharpening
             subtypes = new List<string>();
             counters = new List<string>();
             keywords = new List<string>();
+            color = new List<string>();
 
             previousLocation = CardLocation.Library;
             location = CardLocation.Library;
