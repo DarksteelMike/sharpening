@@ -39,5 +39,16 @@ namespace Sharpening
                 c.DoPayment();
             }
         }
+        
+        internal int Converted()
+        {
+        	int Result = 0;
+        	foreach(Cost c in Costs)
+        	{
+        		Result += c.Converted();
+        	}
+        	
+        	return Result;
+        }
     }
 }

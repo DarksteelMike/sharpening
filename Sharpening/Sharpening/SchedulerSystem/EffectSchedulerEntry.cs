@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Sharpening
 {
+	internal enum PhasePart { Beginning, End };
     internal class EffectSchedulerEntry
     {
         private Effect myEffect;
@@ -23,6 +24,11 @@ namespace Sharpening
         {
             get { return waitingFor_Phase; }
         }
+        private PhasePart waitingFor_PhasePart;
+        internal PhasePart WaitingFor_PhasePart
+        {
+        	get { return waitingFor_PhasePart; }
+        }
         private bool removeAfterRun;
         internal bool RemoveAfterRun
         {
@@ -34,12 +40,13 @@ namespace Sharpening
             myEffect(param);
         }
 
-        internal EffectSchedulerEntry(Effect e, CardBase c, Player p, Phase ph, bool r)
+        internal EffectSchedulerEntry(Effect e, CardBase c, Player p, Phase ph,PhasePart pp, bool r)
         {
             myEffect = e;
             cardSrc = c;
             waitingFor_Player = p;
             waitingFor_Phase = ph;
+            waitingFor_PhasePart = pp;
             removeAfterRun = r;
         }
     }

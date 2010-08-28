@@ -21,7 +21,7 @@ namespace Sharpening
             InvalidChars.Add('\"');
             InvalidChars.Add('û');
             InvalidChars.Add('ö');
-            foreach (char c in System.IO.Path.GetInvalidFileNameChars())
+            foreach (char c in InvalidChars)
             {
                 Ret = Ret.Replace(c.ToString(), "");
             }
@@ -79,6 +79,45 @@ namespace Sharpening
         	}
         	
         	return Result;
+        }
+        
+        internal static CELayerEntry GetApplyPTCounterEffect(CardBase src)
+        {
+        	CELayerEntry ApplyPTCounters = new CELayerEntry();
+            ApplyPTCounters.CardSrc = src;
+            ApplyPTCounters.CardTgt = src;
+            ApplyPTCounters.IsCDA = false;
+            ApplyPTCounters.DependsFields.Add(typeof(CharacteristicsCollection).GetField("Types"));
+            ApplyPTCounters.TargetFields.Add(typeof(CharacteristicsCollection).GetField("Power"));
+            ApplyPTCounters.TargetFields.Add(typeof(CharacteristicsCollection).GetField("Toughness"));
+            ApplyPTCounters.AppliesTo = new Condition(delegate(object[] param) {
+                                                      	return ((CardBase)param[0]).CurrentCharacteristics.Types.Contains("Creature");
+                                                      });
+            ApplyPTCounters.MyEffect = new Effect(delegate(object[] param) {
+                                                  	foreach(string Counter in ((CardBase)param[0]).CurrentCharacteristics.Counters)
+                                                  	{
+                                                  		if(!(Counter.StartsWith("+") ||Counter.StartsWith("-")))
+                                                  		{
+                                                  			break;                                                  			
+                                                  		}
+                                                  		
+                                                  		int PowerPump = int.Parse(Counter.Substring(1,Counter.IndexOf('/')));
+                                                  		int ToughnessPump = int.Parse(Counter.Substring(Counter.IndexOf('/')+2));
+                                                  		
+                                                  		if(Counter.StartsWith("+"))
+                                                  		{
+                                                  			((CardBase)param[0]).CurrentCharacteristics.Power += PowerPump;
+                                                  			((CardBase)param[0]).CurrentCharacteristics.Toughness += ToughnessPump;
+                                                  		}
+                                                  		else
+                                                  		{
+                                                  			((CardBase)param[0]).CurrentCharacteristics.Power -= PowerPump;
+                                                  			((CardBase)param[0]).CurrentCharacteristics.Toughness -= ToughnessPump;
+                                                  		}
+                                                  	}
+                                                  });
+            
+            return ApplyPTCounters;
         }
 
         internal static readonly string Numbers = "0123456789";

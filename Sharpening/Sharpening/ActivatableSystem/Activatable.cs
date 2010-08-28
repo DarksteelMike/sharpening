@@ -17,11 +17,29 @@ namespace Sharpening
         {
             get { return isManaAbility; }
         }
-
-        private CompoundCost myCost;
-        internal CompoundCost MyCost
+        private bool isCastingAbility;
+        internal bool IsCastingAbility
         {
-            get { return myCost; }
+        	get { return isCastingAbility; }
+        }
+
+        private CompoundCost baseCost;
+        internal CompoundCost BaseCost
+        {
+            get { return baseCost; }
+        }
+        
+        private CompoundCost currentCost;
+        internal CompoundCost CurrentCost
+        {
+        	get 
+        	{
+        			if(currentCost == null)
+        			{
+        				return baseCost;
+        			}
+        			return currentCost;
+        	}
         }
 
         private Condition canBeActivated;
@@ -42,11 +60,12 @@ namespace Sharpening
             get { return description; }
         }
 
-        internal Activatable(CardBase cardsrc,bool manaability,CompoundCost cost,Condition canbeactivated,CompoundEffect effect,string desc)
+        internal Activatable(CardBase cardsrc,bool manaability,bool castingability,CompoundCost cost,Condition canbeactivated,CompoundEffect effect,string desc)
         {
             cardSrc = cardsrc;
             isManaAbility = manaability;
-            myCost = cost;
+            isCastingAbility = castingability;
+            baseCost = cost;
             canBeActivated = canbeactivated;
             activatedEffect = effect;
             description = desc;

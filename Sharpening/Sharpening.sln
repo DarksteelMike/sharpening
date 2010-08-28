@@ -1,6 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
+# SharpDevelop 2.2.1.2648
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpening", "Sharpening\Sharpening.csproj", "{8FC354B0-9731-4C68-AE87-0BE0B6B7E252}"
 EndProject
 Global
