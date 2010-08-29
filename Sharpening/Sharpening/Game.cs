@@ -68,6 +68,12 @@ namespace Sharpening
             get { return phaseNum; }
         }
 
+        private PhaseEnabler phaseEnabled;
+        internal PhaseEnabler PhaseEnabled
+        {
+            get { return phaseEnabled; }
+        }
+
         private Stack<Spell> spellStack;
 
         internal void PushSpell(Spell s)
@@ -119,6 +125,7 @@ namespace Sharpening
             Effect DrawEffect = new Effect(delegate(object[] param)
                                            {
                                            		//Draw code here.
+                                               players[whoseTurn].DrawCard.Run(1);
                                            });
             Effect CleanupEffect = new Effect(delegate(object[] param)
                                               {
@@ -151,6 +158,7 @@ namespace Sharpening
             {
                 if (spellStack.Count == 0)
                 {
+                    schedulingSystem.LeavingPhase(currentPhase, players[whoseTurn]);
                     ActionStack.Clear();
                     Array a = Enum.GetValues(typeof(Phase));
                     phaseNum++;
@@ -160,7 +168,18 @@ namespace Sharpening
                         whoseTurn = 1 - whoseTurn;
                     }
 
-                    schedulingSystem.LeavingPhase(currentPhase,players[whoseTurn]);
+                    while(!phaseEnabled[(Phase)a.GetValue(phaseNum)])
+                    {
+                        phaseNum++;
+                        
+                        if (phaseNum == a.Length)
+                        {
+                            phaseNum = 0;
+                            whoseTurn = 1 - whoseTurn;
+                        }
+                    }
+
+                    
                     currentPhase = (Phase)a.GetValue(phaseNum);
                     schedulingSystem.EnteredPhase(currentPhase,players[whoseTurn]);
                     //Both players passed in succession,go to next phase

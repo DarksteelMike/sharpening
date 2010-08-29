@@ -50,12 +50,36 @@ namespace Sharpening
             set { landsPlayedThisTurn = value; }
         }
 
-        private ReplacableEvent LoseLife;
-        private ReplacableEvent GainLife;
-        private ReplacableEvent DrawCard;
-        private ReplacableEvent DiscardCard;
-        private ReplacableEvent DiscardCardAsCost;
-        private ReplacableEvent DiscardCardAsEffect;
+        private ReplacableEvent loseLife;
+        internal ReplacableEvent loseLife
+        {
+            get { return loseLife; }
+        }
+        private ReplacableEvent gainLife;
+        internal ReplacableEvent GainLife
+        {
+            get { return gainLife; }
+        }
+        private ReplacableEvent drawCard;
+        internal ReplacableEvent DrawCard
+        {
+            get { return drawCard; }
+        }
+        private ReplacableEvent discardCard;
+        internal ReplacableEvent DiscardCard
+        {
+            get { return discardCard; }
+        }
+        private ReplacableEvent discardCardAsCost;
+        internal ReplacableEvent DiscardCardAsCost
+        {
+            get { return discardCardAsCost; }
+        }
+        private ReplacableEvent discardCardAsEffect;
+        internal ReplacableEvent DiscardCardAsEffect
+        {
+            get { return discardCardAsEffect; }
+        }
 
         private List<CardBase> libraryCards;
         internal List<CardBase> LibraryCards

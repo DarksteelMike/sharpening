@@ -55,9 +55,106 @@ namespace Sharpening
                                 }
                                 for (int i = 3; i < SplitType.Length; i++)
                                 {
+                                    if (SplitType[i].StartsWith("Location="))
+                                    {
+                                        string[] AllowedLocations = SplitType[i].Substring(SplitType[i].IndexOf("=") + 1).Split(',');
+                                        bool found = false;
+                                        foreach (string s in AllowedLocations)
+                                        {
+                                            if (((CardBase)param[0]).CurrentCharacteristics.Location.ToString() == s)
+                                            {
+                                                found = true;
+                                            }
+                                        }
 
+                                        if (!found)
+                                        {
+                                            return false;
+                                        }
+                                    }
+                                    else if (SplitType[i].StartsWith("Type="))
+                                    {
+                                        string[] AllowedTypes = SplitType[i].Substring(SplitType[i].IndexOf("=") + 1).Split(',');
+                                        bool found = false;
+                                        foreach (string s in AllowedTypes)
+                                        {
+                                            if (((CardBase)param[0]).HasAnyType(s))
+                                            {
+                                                found = true;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            return false;
+                                        }
+                                    }
+                                    else if (SplitType[i].StartsWith("Color="))
+                                    {
+                                        string[] AllowedColors = SplitType[i].Substring(SplitType[i].IndexOf("=") + 1).Split(',');
+                                        bool found = false;
+                                        foreach (string s in AllowedColors)
+                                        {
+                                            if (((CardBase)param[0]).CurrentCharacteristics.Color.Contains(s))
+                                            {
+                                                found = true;
+                                            }
+                                        }
+
+                                        if (!found)
+                                        {
+                                            return false;
+                                        }
+                                    }
+                                    else if (SplitType[i].StartsWith("CMC="))
+                                    {
+                                        string AllowedCMC = SplitType[i].Substring(SplitType[i].IndexOf("=") + 1);
+                                        if (AllowedCMC.StartsWith("LESSTHANOREQUAL"))
+                                        {
+                                            if (!(((CardBase)param[0]).Activatables[0].BaseCost.Converted() <= int.Parse(AllowedCMC.Substring(15))))
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                        else if (AllowedCMC.StartsWith("LESSTHAN"))
+                                        {
+                                            if (!(((CardBase)param[0]).Activatables[0].BaseCost.Converted() < int.Parse(AllowedCMC.Substring(15))))
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                        else if (AllowedCMC.StartsWith("GREATERTHANOREQUAL"))
+                                        {
+                                            if (!(((CardBase)param[0]).Activatables[0].BaseCost.Converted() >= int.Parse(AllowedCMC.Substring(15))))
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                        else if (AllowedCMC.StartsWith("GREATERTHAN"))
+                                        {
+                                            if (!(((CardBase)param[0]).Activatables[0].BaseCost.Converted() < int.Parse(AllowedCMC.Substring(15))))
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                        else if (AllowedCMC.StartsWith("EQUAL"))
+                                        {
+                                            if (!(((CardBase)param[0]).Activatables[0].BaseCost.Converted() == int.Parse(AllowedCMC.Substring(15))))
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                        else if (AllowedCMC.StartsWith("NOTEQUAL"))
+                                        {
+                                            if (!(((CardBase)param[0]).Activatables[0].BaseCost.Converted() != int.Parse(AllowedCMC.Substring(15))))
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                    
                                 }
-                                return false;
+                                return true;
                             });
                     }
                 }
@@ -122,8 +219,10 @@ namespace Sharpening
             	                             {
             	                             	return param[0] != null;
             	                             });
-            	
+
+                ret = new InputState(g, NewCondition, "Main Phase", EmptyCard, EmptyVNP, EmptyVNP, EmptyVNP, null);            	
             }
+
             return ret;
         }
     }
