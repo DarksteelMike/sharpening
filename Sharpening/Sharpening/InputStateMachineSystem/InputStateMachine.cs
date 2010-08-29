@@ -50,5 +50,10 @@ namespace Sharpening
             InvolvedGame = g;
             standardState = CurrentState = s;
         }
+        
+        internal void Run(){
+        	while(!CurrentState.IsDone)
+        	{}
+        }
     }
 }

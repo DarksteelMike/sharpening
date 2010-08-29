@@ -65,6 +65,11 @@ namespace Sharpening
             return false;
         }
 
+        internal bool HasAnyType(string AnyType)
+        {
+            return HasSupertype(AnyType) || HasType(AnyType) || HasSubType(AnyType);
+        }
+
         protected List<TextChangeOperation> typeChangeOperations;
         internal List<TextChangeOperation> TypeChangeOperations
         {
